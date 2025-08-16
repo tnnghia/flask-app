@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chọn thí sinh</title>
+</head>
+<body>
+    <h3>Kết quả tìm kiếm:</h3>
+<ul>
+  {% for row in results %}
+    <li>
+      <a href="{{ url_for('edit', matsxt=row.MaTSXT) }}">
+        {{ row.MaTSXT }} - {{ row.Holot }} {{ row.Ten }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+
+
+</body>
+</html>

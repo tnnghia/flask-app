@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Giấy Báo Trúng Tuyển</title>
+  <style>
+    body {
+      font-family: "Times New Roman", Times, serif;
+      margin: 40px;
+      line-height: 1;
+    }
+    .header {
+      text-align: center;
+	  line-height: 1;
+    }
+	.footer {	
+	  line-height: 1;
+	}
+    .section-title {
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 20px;
+      text-transform: uppercase;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    td {
+      padding: 5px;
+      vertical-align: top;
+    }
+    .info-table td:first-child {
+      width: 25%;
+      font-weight: bold;
+    }
+    .note {
+      font-style: italic;
+    }
+	.print-btn {
+            margin-top: 20px;
+            text-align: center;
+        }
+    @media print {
+		.print-btn {
+        display: none;
+        }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+  	<table>
+    <tr>
+	<td>TRƯỜNG CAO ĐẲNG NGHỀ<br>VIỆT NAM - HÀN QUỐC CÀ MAU<br><u><b>HỘI ĐỒNG TUYỂN SINH NĂM 2025</b></u></td>
+	<td><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><u><b>Độc lập - Tự do - Hạnh phúc</b></u></td>
+	</tr>
+    </table>
+  </div>
+
+
+  <div class="section-title" style="font-size: 18px;">
+    GIẤY BÁO TRÚNG TUYỂN<br><u>{{ 'Đợt 1 (06/2025)' if ts.MaDXT=='001' else 'Đợt 2 (08/2025)' }}</u>
+  </div>
+
+  <div class="section-title" style="font-size: 16px;">
+    HỘI ĐỒNG TUYỂN SINH<br>
+    TRƯỜNG CAO ĐẲNG NGHỀ VIỆT NAM - HÀN QUỐC CÀ MAU THÔNG BÁO
+  </div>
+
+  <table class="info-table">
+    <tr><td>- Thí sinh:</td><td>{{ ts.Holot }} {{ ts.Ten }}</td></tr>
+	<tr><td>- Giới tính:</td><td>{{ 'Nam' if ts.Gioitinh==0 else 'Nữ' }}</td></tr>
+    <tr><td>- Mã số:</td><td>{{ ts.Maso }}</td></tr>
+    <tr><td>- Ngày sinh:</td>
+		<td>
+			{{ ts.Ngaysinh.strftime('%d/%m/%Y') if ts.Ngaysinh else '' }}
+		</td>
+	</tr>
+    <tr><td>- Địa chỉ:</td><td>{{ ts.Diachi }}</td></tr>
+    <tr><td>- Số điện thoại:</td><td>{{ ts.Dienthoai }}</td></tr>
+    <tr><td>- Ngành, nghề:</td><td>{{ ts.Dacdiem }}</td></tr>
+    <tr><td>- Trình độ:</td><td>{{ ts.BacDTHienthi }}</td></tr>
+  </table>
+
+  <p align="center" font-weight: bold>
+  <strong>
+  Thí sinh đã trúng tuyển vào học tại TRƯỜNG CAO ĐẲNG NGHỀ VIỆT NAM - HÀN QUỐC CÀ MAU<br>
+  theo ngành, nghề và trình độ đào tạo như trên
+  </strong>
+  </p>
+  Yêu cầu thí sinh có mặt để thực hiện những nội dung như sau:
+  <table>
+    <tr><td><strong>1. Làm thủ tục nhập học:</strong></td><td></td></tr>
+    <tr><td>- Thời gian:</td><td>Từ ngày 27/6 đến ngày 11/7/2025</td></tr>
+    <tr><td>- Địa điểm:</td><td>Trụ sở chính (Số 08 Mậu Thân, P. An Xuyên, Tỉnh Cà Mau)</td></tr>
+  </table>
+
+  <p class="note">
+    Lưu ý:<br>
+	- Thí sinh phải làm thủ tục nhập học trong thời gian quy định.<br>
+	- Khi đến làm thủ tục nhập học thí sinh cần mangtheo số tiền cần thiết để đóng đầu năm và các loại hồ sơ<br>
+    còn thiếu để bổ sung.<br>
+  </p>
+
+  <table>
+    <tr><td><strong>2. Nhập học chính thức:</strong></td><td></td></tr>
+    <tr><td>- Thời gian:</td><td>08g00 ngày 08/9/2025</td></tr>
+    <tr><td>- Địa điểm:</td><td>Cơ sở 2 (Số 02 Nguyễn Tất Thành, P. Lý Văn Lâm, Tỉnh Cà Mau)</td></tr>
+  </table>
+ 
+  <p class="note">
+  Thí sinh đến trường nhập học phải mặc đồng phục và mang theo tập, viết để học nội quy, quy chế./.
+  </p>
+  <div class="footer">
+  	<table>
+		<tr>
+			<td></td>
+			<td align="center">
+				<b>TM. HỘI ĐỒNG TUYỂN SINH</b><br>
+				{% if nguoiky=="Từ Hoàng Ân" %}
+					<b>CHỦ TỊCH HỘI ĐỒNG</b>
+				{% else %}
+					<b>P. CHỦ TỊCH HỘI ĐỒNG</b>
+				{% endif %}
+			</td>
+		</tr>
+	<tr>
+	<td>
+	<i>__________________________________<br><br>
+	Khi cần biết thêm thông tin, vui lòng liên hệ:<br>
+	Điện thoại: 02903.592.101-02903.592.102<br>
+	Truy cập Website: <a href="https://camauvkc.edu.vn">https://camauvkc.edu.vn</a><br>
+	Facebook: <a href="https://facebook.com/camauvkc">https://facebook.com/camauvkc</a><br>
+	Zalo: <a href="http://zalo.me/camauvkc">http://zalo.me/camauvkc</a><br></i>
+	</td><td align="center"><b><br><br><br><br><br><br>{{ nguoiky }}</b></td>
+	</tr>
+    </table>
+  </div>
+  <div class="print-btn">
+        <button onclick="window.print()">In Giấy báo</button>
+    </div>
+</body>
+</html>

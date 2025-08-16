@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa thí sinh</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            row-gap: 12px;
+            column-gap: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        label {
+            text-align: left;
+            padding-top: 6px;
+            font-weight: bold;
+        }
+        input, select {
+			text-align: left;
+            padding: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .row-full {
+            grid-column: 1 / -1;
+        }
+        .truong-filter {
+            display: flex;
+            gap: 10px;
+        }
+        .truong-filter > div {
+            flex: 1;
+        }
+		.checkbox-label {
+			display: inline-flex;
+			text-align: left;
+			gap: 6px;
+			margin-right: 15px;
+			margin-bottom: 6px;
+		}
+		fieldset {
+			margin-bottom: 12px;
+		}
+		.section {
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			margin-bottom: 20px;
+		}
+
+		.section legend {
+			font-weight: bold;
+		}
+
+		.form-row {
+			display: flex;
+			align-items: center;
+			margin: 6px 0;
+		}
+		.form-row input[type="checkbox"] {
+			margin-right: 10px;
+			transform: scale(1.2);
+		}
+		.form-row label {
+			margin-right: 10px;
+			flex: 1;
+			min-width: 250px;
+		}
+		.form-row input[type="text"] {
+			flex: 2;
+			padding: 4px 8px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}	  
+		.form-row select {
+			flex: 2;
+			height: 34px;
+			padding: 4px 8px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Chỉnh sửa/Cập nhật thông tin</h2>
+    <form method="POST">
+		<h3>1. Thông tin thí sinh</h3><br>
+        <input type="hidden" name="MaTSXT" value="{{ ts.MaTSXT }}" readonly>
+		
+        <label>Mã số:</label>
+        <input type="text" name="Maso" value="{{ ts.Maso }}" readonly>
+
+		<label>Họ và Tên:</label>
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+				<input type="text" name="Holot" value="{{ ts.Holot or ''}}" placeholder="Họ lót">
+				<input type="text" name="Ten" value="{{ ts.Ten or ''}}" placeholder="Tên">
+		</div>
+		
+        <label>Giới tính:</label>
+        <select name="Gioitinh">
+            <option value="0" {% if ts.Gioitinh == 0 %}selected{% endif %}>Nam</option>
+            <option value="1" {% if ts.Gioitinh == 1 %}selected{% endif %}>Nữ</option>
+        </select>
+
+        <label>Ngày sinh:</label>
+        <input type="date" name="Ngaysinh" value="{{ ts.Ngaysinh.strftime('%Y-%m-%d') if ts.Ngaysinh else '' }}">
+		
+		<label>Nơi sinh:</label>
+		<input type="text" name="Noisinh" value="{{ ts.Noisinh or ''}}" placeholder="Nơi sinh, chỉ nhập tên Tỉnh">
+		
+		<label>Căn cước công đân:</label>
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+				<input type="text" name="SoCMND" value="{{ ts.SoCMND or ''}}" placeholder="Số CCCD">
+				<input type="date" name="NgaycapCMND" value="{{ ts.NgaycapCMND.strftime('%Y-%m-%d') if ts.NgaycapCMND else '' }}">
+				<select name="NoicapCMND">
+					<option value="Cục trưởng CCSQLHC về TTXH" {% if ts.NoicapCMND == "Cục trưởng CCSQLHC về TTXH" %}selected{% endif %}>Cục trưởng CCSQLHC về TTXH</option>
+					<option value="Bộ Công An" {% if ts.NoicapCMND == "Bộ Công An" %}selected{% endif %}>Bộ Công An</option>
+					<option value="CA tỉnh Cà Mau" {% if ts.NoicapCMND == "CA tỉnh Cà Mau" %}selected{% endif %}>CA tỉnh Cà Mau</option>					
+					<option value="CA tỉnh Bạc Liêu" {% if ts.NoicapCMND == "CA tỉnh Bạc Liêu" %}selected{% endif %}>CA tỉnh Bạc Liêu</option>
+					<option value="CA tỉnh Kiên Giang" {% if ts.NoicapCMND == "CA tỉnh Kiên Giang" %}selected{% endif %}>CA tỉnh Kiên Giang</option>
+					<option value="CA tỉnh Sóc Trăng" {% if ts.NoicapCMND == "CA tỉnh Sóc Trăng" %}selected{% endif %}>CA tỉnh Sóc Trăng</option>
+				</select>
+			</div>   
+
+        <label>Dân tộc:</label>
+        <select name="MaDT">
+		{% for dt in dantoc %}
+			<option value="{{ dt[0] }}" {% if dt[0] == ts.MaDT %}selected{% elif not ts.MaDT and dt[0] == 'KIN' %}selected{% endif %}>{{ dt[1] }}</option>
+		{% endfor %}
+		</select>
+		
+		<label>Tôn giáo:</label>
+        <select name="MaTG">
+		{% for tg in tongiao %}
+			<option value="{{ tg[0] }}" {% if tg[0] == ts.MaTG %}selected{% elif not ts.MaTG and tg[0] == 'KHO' %}selected{% endif %}>{{ tg[1] }}</option>
+		{% endfor %}
+		</select>
+		
+		<label>Đối tượng chính sách:</label>
+        <select name="MaDTCS">
+		<option value="">-- Chọn đối tượng chính sách --</option>
+		{% for cs in dtcs %}
+			<option value="{{ cs[0] }}" {% if cs[0] == ts.MaDTCS %}selected{% elif not ts.MaDTCS and cs[0] == 'KHO' %}selected{% endif %}>{{ cs[1] }} - [{{ cs[2] }}]</option>
+		{% endfor %}
+		</select>
+		
+		<label>Hộ khẩu/Địa chỉ:</label>
+		<div style="display: flex; gap: 10px;">
+			<input type="text" name="Hokhau" id="Hokhau" value="{{ ts.Hokhau or '' }}" readonly>
+			<button type="button" onclick="openDiaChiModal()" style="padding: 6px 18px;">🗺️ Chọn địa chỉ</button>
+		</div>
+		
+		<label>Điện thoại:</label>
+        <input type="text" name="Dienthoai" value="{{ ts.Dienthoai or '' }}">
+		
+		<label>Email:</label>
+        <input type="text" name="Email" value="{{ ts.Email or '' }}">
+		
+		<label>Ghi chú:</label>
+        <input type="text" name="Ghichu" value="{{ ts.Ghichu or ''}}">
+		
+	<h3>2. Thông tin hồ sơ </h3><br>
+	<div class="row-full">
+    <fieldset class="section">
+        <legend>Hồ sơ chung</legend>
+		<div class="form-row">
+			<label>Phiếu đăng ký dự tuyển (*)</label>
+			<input type="checkbox" name="hs1" value="1" {% if hoso.hs1 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>Sơ yếu lý lịch (*)</label>
+			<input type="checkbox" name="hs2" value="1" {% if hoso.hs2 %}checked{% endif %}>
+		</div>
+        <div class="form-row">
+			<label>Giấy khai sinh</label>
+			<input type="checkbox" name="hs3" value="1" {% if hoso.hs3 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>CMND/CCCD (*)</label>
+			<input type="checkbox" name="hs12" value="1" {% if hoso.hs12 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>02 ảnh màu (3x4)</label>
+			<input type="checkbox" name="hs11" value="1" {% if hoso.hs11 %}checked{% endif %}>
+		</div>
+
+    </fieldset>
+    <fieldset>
+        <legend><strong>Hồ sơ cao đẳng</strong></legend>
+		<div class="form-row">
+			<label>Bằng TN THPT (*)</label>
+			<input type="checkbox" name="hs4" value="1" {% if hoso.hs4 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>GCN TN THPT tạm thời (*)</label>
+			<input type="checkbox" name="hs5" value="1" {% if hoso.hs5 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>Học bạ THPT (*)</label>
+			<input type="checkbox" name="hs8" value="1" {% if hoso.hs8 %}checked{% endif %}>
+		</div>
+    </fieldset>
+    <fieldset>
+        <legend><strong>Hồ sơ trung cấp</strong></legend>
+		<div class="form-row">
+			<label>Bằng TN THCS (*)</label>
+			<input type="checkbox" name="hs6" value="1" {% if hoso.hs6 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>GCN TN THCS tạm thời (*)</label>
+			<input type="checkbox" name="hs7" value="1" {% if hoso.hs7 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>Học bạ THCS (*)</label>
+			<input type="checkbox" name="hs9" value="1" {% if hoso.hs9 %}checked{% endif %}>
+		</div>
+    </fieldset>
+    <fieldset>
+        <legend><strong>Hồ sơ liên thông</strong></legend>
+		<div class="form-row">
+			<label>Bằng TN Trung cấp (*)</label>
+			<input type="checkbox" name="hs15" value="1" {% if hoso.hs15 %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>Học bạ/Bảng điểm VH (*)</label>
+			<input type="checkbox" name="hs16" value="1" {% if hoso.hs16 %}checked{% endif %}>
+		</div>
+    </fieldset>
+	<fieldset>
+        <legend><strong>Thông tin bổ sung</strong></legend>
+		<div class="form-row">
+			<label>Nộp online</label>
+			<input type="checkbox" name="NopOnline" value="1" {% if hoso.NopOnline %}checked{% endif %}>
+		</div>
+		<div class="form-row">
+			<label>Tiếp cận thông tin</label>
+			<select name="MaTiepCan">
+				<option value="1" {% if hoso.MaTiepCan == "1" %}selected{% endif %}>Mạng xã hội Facebook hoặc Zalo của Trường</option>
+				<option value="2" {% if hoso.MaTiepCan == "2" %}selected{% endif %}>Website của Trường</option>				
+				<option value="3" {% if hoso.MaTiepCan == "3" %}selected{% endif %}>Báo & Đài truyền thanh, truyền hình</option>
+				<option value="4" {% if hoso.MaTiepCan == "4" %}selected{% endif %}>Áp phích, băng-rôn, tờ rơi</option>
+				<option value="5" {% if hoso.MaTiepCan == "5" %}selected{% endif %}>HĐTS đến Trường PT tư vấn</option>
+				<option value="6" {% if hoso.MaTiepCan == "6" %}selected{% endif %}>Thầy, Cô trong Trường PT thông tin</option>
+				<option value="7" {% if hoso.MaTiepCan == "7" %}selected{% endif %}>Cựu HSSV</option>
+				<option value="8" {% if hoso.MaTiepCan == "8" %}selected{% endif %}>HSSV đang học</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label>Giấy tờ ưu tiên</label>
+			<input type="textbox" name="hs13" value="{{ hoso.hs13 or '' }}" >
+		</div>
+		<div class="form-row">
+			<label>Điện thoại phụ huynh</label>
+			<input type="textbox" name="SoDT" value="{{ hoso.SoDT or ''}}">
+		</div>
+		<div class="form-row">
+			<label>Ghi chú hồ sơ</label>
+			<input type="textbox" name="Ghichuthem" value="{{ hoso.GhiChu or ''}}">
+		</div>
+    </fieldset>
+</div>
+
+	<h3>3. Thông tin xét tuyển</h3><br>
+	    <div class="row-full truong-filter">
+            <div>
+                <label for="search-truong">Lọc trường:</label>
+                <input type="text" id="search-truong" placeholder="Nhập từ khoá...">
+            </div>
+            <div>
+                <label>Trường THPT:</label>
+                <select name="MaTHPT" id="truong-select">
+                    {% for trg in matruong %}
+                        <option value="{{ trg[0] }}" {% if trg[0] == ts.MaTHPT %}selected{% elif not ts.MaTHPT and trg[0] == '015' %}selected{% endif %}>
+                            {{ trg[1] }} - [{{ trg[2] }}]
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+		<label>Tốt nghiệp:</label>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+		<select name="NamTN">
+            {% for year in range(2000, current_year+1) %}
+                <option value="{{ year }}" {% if ts.NamTN == year %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+		</select>
+		<select name="Fld01">
+			<option value="TN THCS" {% if ts.Fld01 == "TN THCS" %}selected{% endif %}>TN THCS</option>
+			<option value="TN THPT" {% if ts.Fld01 == "TN THPT" %}selected{% endif %}>TN THPT</option>
+			<option value="Lớp 10" {% if ts.Fld01 == "Lớp 10" %}selected{% endif %}>Lớp 10</option>
+			<option value="Lớp 11" {% if ts.Fld01 == "Lớp 11" %}selected{% endif %}>Lớp 11</option>
+			<option value="Đang lớp 12" {% if ts.Fld01 == "Đang lớp 12" %}selected{% endif %}>Đang lớp 12</option>
+			<option value="Hoàn thành THPT" {% if ts.Fld01 == "Hoàn thành THPT" %}selected{% endif %}>Hoàn thành THPT</option>
+			<option value="Trung cấp" {% if ts.Fld01 == "Trung cấp" %}selected{% endif %}>Trung cấp</option>
+			<option value="Cao đẳng" {% if ts.Fld01 == "Cao đẳng" %}selected{% endif %}>Cao đẳng</option>
+			<option value="Đại học" {% if ts.Fld01 == "Đại học" %}selected{% endif %}>Đại học</option>
+		</select>
+		</div>
+		
+		<label>Nguyện vọng 1:</label>
+		<select name="MaNG1">
+			<option value="">-- Chọn ngành --</option>
+			{% for ng in nganhhoc %}
+			<option value="{{ ng[0] }}" {% if ng[0] == mang1 %}selected{% endif %}>{{ ng[1] }}</option>
+			{% endfor %}
+		</select>
+
+		<label>Nguyện vọng 2:</label>
+		<select name="MaNG2">
+			<option value="">-- Chọn ngành --</option>
+			{% for ng in nganhhoc %}
+			<option value="{{ ng[0] }}" {% if ng[0] == mang2 %}selected{% endif %}>{{ ng[1] }}</option>
+			{% endfor %}
+		</select>
+
+		<label>Nguyện vọng 3:</label>
+		<select name="MaNG3">
+			<option value="">-- Chọn ngành --</option>
+			{% for ng in nganhhoc %}
+			<option value="{{ ng[0] }}" {% if ng[0] == mang3 %}selected{% endif %}>{{ ng[1] }}</option>
+			{% endfor %}
+		</select>
+
+		<label>Toán:</label>
+		<input type="number" step="0.1" name="Diem1" value="{{ diem1 }}">
+
+		<label>Ngữ văn:</label>
+		<input type="number" step="0.1" name="Diem2" value="{{ diem2 }}">
+
+		<label>Ngoại ngữ:</label>
+		<input type="number" step="0.1" name="Diem3" value="{{ diem3 }}">
+		
+
+		<div class="row-full" style="text-align:center; margin-top: 20px;">
+			<div style="display: inline-flex; gap: 12px; justify-content: center;">
+				<button type="submit" name="action" value="luu_toan_bo"
+					style="padding:8px 16px; background:green; color:white; border:none; border-radius:4px; font-size:16px; cursor:pointer;">
+					💾 Lưu toàn bộ thay đổi
+				</button>
+				<a href="{{ url_for('phieu_nhan_hoso', matsxt=ts.MaTSXT) }}" target="_blank"
+					style="display:inline-block; padding:8px 16px; background:green; color:white; text-decoration:none; border-radius:4px; font-size:16px;">
+					🖨️ In phiếu nhận hồ sơ
+				</a>
+				<!-- Nút mở popup -->
+				<button type="button" onclick="openModal()"
+						style="display:inline-block; padding:8px 16px; background:green; color:white; text-decoration:none; border-radius:4px; font-size:16px;">
+					🔍 Cập nhật trúng tuyển/nhập học/In giấy báo
+				</button>
+			</div>
+		</div>
+	</form>	
+
+	<!-- Modal (popup) -->
+	<form method="post" action="">
+		<div id="modalTrungTuyen" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+			<div style="background-color:white; margin:5% auto; padding:20px; border-radius:10px; width:60%; max-width:600px; position:relative;">
+			  
+				<!-- Fieldset: Cập nhật trúng tuyển -->
+				<fieldset style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+					<legend style="font-weight:bold;">🔍 Cập nhật trúng tuyển/nhập học</legend>
+					<!-- Trạng thái trúng tuyển -->
+					<div style="margin-top:1px;">
+						<label style="display:block; margin-bottom:5px;"></label>
+						<div style="padding-left: 10px;">
+						{% if nv_trung_tuyen %}
+						Thí sinh đã trúng tuyển nguyện vọng {{ nv_trung_tuyen }}.
+						{% else %}
+						Thí sinh chưa trúng tuyển
+						{% endif %}
+						</div>
+					</div>
+				<!-- Chọn nguyện vọng -->
+				<div style="display:flex; align-items:center; margin-top:15px; gap:10px;">
+				  <label for="nv_trungtuyen" style="width: 140px;">Trúng tuyển:</label>
+				  <select name="nv_trungtuyen" id="nv_trungtuyen" required style="flex:1; padding:6px;">
+					{% if not nv_trung_tuyen %}
+					  <option value="" selected>-- Chọn nguyện vọng để xét tuyển --</option>
+					{% endif %}
+					<option value="1" {% if nv_trung_tuyen == 1 %}selected{% endif %}>Nguyện vọng 1</option>
+					<option value="2" {% if nv_trung_tuyen == 2 %}selected{% endif %}>Nguyện vọng 2</option>
+					<option value="3" {% if nv_trung_tuyen == 3 %}selected{% endif %}>Nguyện vọng 3</option>
+				  </select>
+				</div>
+
+				<!-- Checkbox nhập học -->
+				<div style="display:flex; align-items:center; margin-top:15px; gap:10px;">
+					<label for="nhaphoc" style="width: 140px;">Nhập học:</label>
+					<select name="nhaphoc" id="nhaphoc" style="flex:1; padding:6px;">
+						<option value="0" {% if ts.Nhaphoc in (0, '', None) %}selected{% endif %}>Chưa làm thủ tục nhập học</option>
+						<option value="1" {% if ts.Nhaphoc == 1 %}selected{% endif %}>Đã làm thủ tục nhập học</option>
+					</select>
+				</div>
+
+				<!-- Nút hành động -->
+				<div style="display:flex; justify-content:center; gap: 12px; margin-top: 25px; flex-wrap: wrap;">
+				  <button type="submit" name="action" value="xettuyen" style="padding:8px 16px; background:#007bff; color:white; border:none; border-radius:4px;">
+					✅ Cập nhật
+				  </button>
+				  <button type="button" onclick="closeModal()" style="padding:8px 16px; background:#dc3545; color:white; border:none; border-radius:4px;">
+					❌ Thoát
+				  </button>
+				</div>
+			  </fieldset>
+
+			  {% if nv_trung_tuyen %}
+			  <!-- Fieldset: In giấy báo -->
+			  <fieldset style="border: 1px solid #ccc; padding: 20px; border-radius: 8px;">
+				<legend style="font-weight:bold;">🖨️ In giấy báo</legend>
+
+				<!-- Chọn người ký -->
+				<div style="display:flex; align-items:center; margin-top:15px; gap:10px;">
+				  <label for="nguoiky" style="width: 130px;">Người ký:</label>
+				  <select name="nguoiky" id="nguoiky" required style="flex:1; padding:6px;">
+					<option value="1">Từ Hoàng Ân</option>
+					<option value="2">Trương Thanh Dũng</option>
+					<option value="3">Huỳnh Minh Hiếu</option>
+				  </select>
+				</div>
+
+				<!-- Nút in -->
+				<div style="display:flex; justify-content:center; margin-top: 25px;">
+				  <button type="button" onclick="inGiayBao()" style="padding:8px 16px; background:#28a745; color:white; border:none; border-radius:4px;">
+					🖨️ In giấy báo
+				  </button>
+				</div>
+			  </fieldset>
+			  {% endif %}
+		  </div>
+		</div>
+	</form>
+	<!-- POPUP chọn địa chỉ -->
+	<div id="diaChiModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000;">
+	  <div style="background:white; margin:5% auto; padding:20px; border-radius:8px; width:90%; max-width:500px; position:relative;">
+		<h3>📍 Nhập địa chỉ</h3>
+
+		<div style="margin-bottom:10px;">
+		  <label>Tỉnh:</label>
+			<select id="select-tinh">
+				<option value="">-- Chọn Tỉnh --</option>
+				{% for tinh in tinhthanh %}
+				<option value="{{ tinh.Maso }}">{{ tinh.Tinhthanh }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		
+		<div style="margin-bottom:10px;">
+		  <label>Xã/Phường:</label>
+			<select id="select-xa">
+				<option value="">-- Chọn Xã/Phường --</option>
+			</select>
+		</div>
+		
+		<div style="margin-bottom:10px;">
+		  <label>Khóm/Ấp:</label>
+		  <input type="text" id="khomap" placeholder="Khóm, Ấp..." style="width:100%;">
+		</div>
+
+		<div style="text-align:right; margin-top:20px;">
+		  <button type="button" onclick="confirmDiaChi()" style="padding:6px 12px; background:green; color:white; border:none; border-radius:4px;">✅ Xác nhận</button>
+		  <button type="button" onclick="closeDiaChiModal()" style="padding:6px 12px; background:gray; color:white; border:none; border-radius:4px;">❌ Đóng</button>
+		</div>
+	  </div>
+	</div>
+
+	<script>
+		function inGiayBao() {
+			const nguoiky = document.getElementById('nguoiky').value;
+			const matsxt = "{{ ts.MaTSXT }}";  // biến từ Flask
+			const url = "{{ url_for('giay_bao') }}?matsxt=" + matsxt + "&nguoiky=" + nguoiky;
+			//const url = "{{ url_for('giay_bao') }}?matsxt=" + encodeURIComponent(matsxt) + "&nguoiky=" + encodeURIComponent(nguoiky);
+			window.open(url, "_blank");
+		}
+
+		function openDiaChiModal() {
+			document.getElementById('diaChiModal').style.display = 'block';
+		}
+
+		function closeDiaChiModal() {
+			document.getElementById('diaChiModal').style.display = 'none';
+		}
+
+		// Ghép địa chỉ
+		function confirmDiaChi() {
+			const khomap = document.getElementById('khomap').value.trim();
+			const xa = document.getElementById('xa').value;
+			const tinh = document.getElementById('tinh').value;
+
+			if (!xa || !tinh) {
+				alert("Vui lòng chọn đầy đủ Xã và Tỉnh.");
+				return;
+			}
+
+			let diachi = "";
+			if (khomap) {
+				diachi += khomap + ", ";
+			}
+			diachi += xa + ", " + tinh;
+
+			document.getElementById('Hokhau').value = diachi;
+			closeDiaChiModal();
+		}
+		
+		document.getElementById('select-tinh').addEventListener('change', function () {
+			const matinh = this.value;
+			const xaSelect = document.getElementById('select-xa');
+			xaSelect.innerHTML = '<option value="">Đang tải...</option>';
+
+			if (!matinh) {
+				xaSelect.innerHTML = '<option value="">-- Chọn Xã/Phường --</option>';
+				return;
+			}
+
+			fetch(`/api/xa_phuong/${matinh}`)
+				.then(response => response.json())
+				.then(data => {
+					xaSelect.innerHTML = '<option value="">-- Chọn Xã/Phường --</option>';
+					data.forEach(xa => {
+						const opt = document.createElement('option');
+						opt.value = xa.MaXa;
+						opt.textContent = xa.TenXa;
+						xaSelect.appendChild(opt);
+					});
+				})
+				.catch(error => {
+					console.error("Lỗi tải xã/phường:", error);
+					xaSelect.innerHTML = '<option value="">Không tải được dữ liệu</option>';
+				});
+		});
+		function removeDiacritics(str) {
+			return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+		}
+
+		document.getElementById('search-truong').addEventListener('input', function () {
+			const searchTerms = removeDiacritics(this.value.toLowerCase()).split(/\s+/);
+			const select = document.getElementById('truong-select');
+			const options = select.querySelectorAll('option');
+
+			options.forEach(option => {
+				if (option.value === '') return;
+
+				const text = removeDiacritics(option.text.toLowerCase());
+				const matched = searchTerms.every(term => text.includes(term));
+				option.style.display = matched ? 'block' : 'none';
+			});
+		});
+		
+		function confirmDiaChi() {
+			const khomap = document.getElementById('khomap').value.trim();
+			const xa = document.getElementById('select-xa');
+			const tinh = document.getElementById('select-tinh');
+
+			if (!xa.value || !tinh.value) {
+				alert("Vui lòng chọn đầy đủ Tỉnh và Xã.");
+				return;
+			}
+
+			const diachi = `${khomap ? khomap + ', ' : ''}${xa.options[xa.selectedIndex].text}, ${tinh.options[tinh.selectedIndex].text}`;
+			document.getElementById('Hokhau').value = diachi;
+			closeDiaChiModal();
+		}
+		
+		function openModal() {
+			document.getElementById('modalTrungTuyen').style.display = 'block';
+		}
+
+		function closeModal() {
+			document.getElementById('modalTrungTuyen').style.display = 'none';
+			// Optional: quay lại trang edit hoặc reload lại trang
+			window.location.href = "{{ url_for('edit', matsxt=ts.MaTSXT) }}";
+		}
+
+		// Click ngoài popup để đóng
+		window.onclick = function (event) {
+			let modal = document.getElementById('modalTrungTuyen');
+			if (event.target == modal) {
+			closeModal();
+			}
+		}
+	</script>
+</body>
+</html>

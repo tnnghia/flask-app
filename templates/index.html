@@ -1,4 +1,242 @@
-<!doctype html>
-<html><body>
-  <h1>Xin chào {{ name }}!</h1>
-</body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đào tạo</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fixed table header with solid background */
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #ffffff; /* White background for a clean look */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; /* Darker thumb for professional look */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        /* Smooth tab transition */
+        .tabcontent {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .tablink.active {
+            background-color: #3b82f6; /* Blue background for active tab */
+            color: white;
+            border-radius: 6px 6px 0 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased">
+
+<div class="container mx-auto p-8">
+    <!-- Navigation Tabs -->
+    <div class="bg-white shadow-sm rounded-lg mb-8">
+        <div class="flex border-b border-gray-200">
+            <button class="tablink px-6 py-3 text-gray-600 font-medium text-lg hover:bg-gray-100 transition duration-200 active" onclick="openTab(event, 'Totnghiep')">
+                Cập nhật tốt nghiệp
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="Totnghiep" class="tabcontent bg-white shadow-sm rounded-lg p-8">
+        <h3 class="text-2xl font-semibold text-gray-900 mb-6">Cập nhật tốt nghiệp</h3>
+
+        <!-- Form Group -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div>
+                <form method="POST" id="db-form">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Chọn CSDL:</label>
+                    <select name="db_select" id="db_select" class="block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                        <option value="DB1" {% if current_db_key == 'DB1' %}selected{% endif %}>EduManUni (New)</option>
+                        <option value="DB2" {% if current_db_key == 'DB2' %}selected{% endif %}>EduMan (Old)</option>
+                    </select>
+                </form>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Chọn lớp:</label>
+                <select id="select-lop" class="block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                    <option value="">-- Chọn lớp --</option>
+                    {% for lop in lop_list %}
+                        <option value="{{ lop.MaL }}">{{ lop.Tenlop }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Chọn QĐTN:</label>
+                <select id="qdtotnghiep" class="block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                    <option value="">-- Chọn quyết định --</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table class="w-full text-sm text-left text-gray-600">
+                <thead class="text-xs text-gray-700 uppercase bg-white border-b">
+                    <tr>
+                        <th class="p-4"><input type="checkbox" id="chk-all" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"></th>
+                        <th class="p-4">Mã SV</th>
+                        <th class="p-4">Họ lót</th>
+                        <th class="p-4">Tên</th>
+                        <th class="p-4">ĐTBTL (Hệ 4)</th>
+                        <th class="p-4">Tốt nghiệp</th>
+						<th class="p-4">Ngày ký</th>						
+                        <th class="p-4">Số hiệu</th>
+                        <th class="p-4">Số vào sổ</th>
+                    </tr>
+                </thead>
+                <tbody id="sv-list" class="bg-white"></tbody>
+            </table>
+        </div>
+
+        <!-- Update Button -->
+        <button id="btn-update-totnghiep" class="mt-8 w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-200 shadow-sm">
+            Cập nhật tốt nghiệp
+        </button>
+    </div>
+</div>
+
+<script>
+function loadQuyetDinhTN() {
+    fetch('/api/quyetdinhtn')
+    .then(res => res.json())
+    .then(data => {
+        let select = document.getElementById('qdtotnghiep');
+        select.innerHTML = '<option value="">-- Chọn quyết định --</option>';
+        data.forEach(qd => {
+            select.innerHTML += `<option value="${qd.MaQDTN}">${qd.So}, ${qd.Ngayky} - ${qd.Noidung}</option>`;
+        });
+    });
+}
+
+function openTab(evt, tabName) {
+    $(".tabcontent").hide();
+    $("#" + tabName).show();
+    $(".tablink").removeClass("active");
+    $(evt.currentTarget).addClass("active");
+}
+
+$(document).ready(function() {
+    loadQuyetDinhTN();
+    openTab({ currentTarget: $(".tablink")[0] }, 'Totnghiep');
+
+    // Chọn tất cả
+    $("#chk-all").change(function(){
+        $(".chk-totnghiep").prop("checked", $(this).prop("checked"));
+    });
+
+    // Load sinh viên khi chọn lớp
+    $("#select-lop").change(function(){
+        let malop = $(this).val();
+        if(!malop) return;
+        $.getJSON("/api/get_sinhvien?MaL=" + malop, function(data){
+            let html = "";
+            data.forEach(function(sv){
+                let diem = sv.DTBTLBon != null ? parseFloat(sv.DTBTLBon).toFixed(2) : "";
+                html += `
+                    <tr class="border-b hover:bg-gray-50 transition duration-100">
+                        <td class="p-4"><input type="checkbox" class="chk-totnghiep h-4 w-4 text-blue-600 rounded focus:ring-blue-500" value="${sv.Maso}"></td>
+                        <td class="p-4">${sv.Maso}</td>
+                        <td class="p-4">${sv.Holot}</td>
+                        <td class="p-4">${sv.Ten}</td>
+                        <td class="p-4">${diem}</td>
+                        <td class="p-4">${sv.Totnghiep == 1 ? "✅" : ""}</td>
+						<td class="p-4">${sv.Ngayky}</td>
+                        <td class="p-4"><input type="text" class="sohieu border border-gray-300 rounded-md p-2 w-full focus:ring-blue-500 focus:border-blue-500" value="${sv.Sohieu || ""}"></td>
+                        <td class="p-4"><input type="text" class="sovaoso border border-gray-300 rounded-md p-2 w-full focus:ring-blue-500 focus:border-blue-500" value="${sv.Sovaoso || ""}"></td>
+                    </tr>
+                `;
+            });
+            $("#sv-list").html(html);
+        });
+    });
+
+    // Cập nhật tốt nghiệp
+    $("#btn-update-totnghiep").click(function(){
+        let list = [];
+        let totalChecked = 0;
+        $("#sv-list tr").each(function(){
+            let chk = $(this).find(".chk-totnghiep");
+            if (chk.is(":checked")) {
+                totalChecked++;
+                let masv = chk.val();
+                let sohieu = $(this).find(".sohieu").val().trim();
+                let sovaoso = $(this).find(".sovaoso").val().trim();
+                list.push({
+                    Maso: masv,
+                    Sohieu: sohieu || null,
+                    Sovaoso: sovaoso || null
+                });
+            }
+        });
+
+        if(totalChecked == 0) {
+            alert("Chưa chọn sinh viên!");
+            return;
+        }
+
+        let MaL = $("#select-lop").val();
+        let MaQDTN = $("#qdtotnghiep").val();
+
+        if(!MaL || !MaQDTN) {
+            alert("Chưa chọn lớp hoặc quyết định tốt nghiệp!");
+            return;
+        }
+
+        $.ajax({
+            url: "/api/update_totnghiep",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                masv_list: list,
+                MaL: MaL,
+                MaQDTN: MaQDTN
+            }),
+            success: function(res){
+                if(res.status === "success") {
+                    alert("Đã cập nhật tốt nghiệp!");
+                    $("#select-lop").trigger("change");
+                } else {
+                    alert(res.message || "Lỗi cập nhật");
+                }
+            },
+            error: function(xhr) {
+                alert("Lỗi: " + xhr.responseText);
+            }
+        });
+    });
+});
+
+$("#db_select").change(function(){
+    $.post("/", { db_select: $(this).val() }, function(){
+        location.reload();
+    });
+});
+</script>
+
+</body>
+</html>

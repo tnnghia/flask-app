@@ -1,2 +1,8 @@
 Flask
 gunicorn
+render_template
+request
+jsonify
+session
+redirect
+pyodbc

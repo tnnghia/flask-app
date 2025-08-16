@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu nhận hồ sơ</title>
+    <style>
+	body {
+      font-family: "Times New Roman", Times, serif;
+      margin: 40px;
+      line-height: 1;
+    }
+    .header {
+      text-align: center;
+	  line-height: 1;
+    }
+	.footer {	
+	  line-height: 1;
+	}
+    .section-title {
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 20px;
+      text-transform: uppercase;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    td {
+      padding: 5px;
+      vertical-align: top;
+    }
+    .info-table td:first-child {
+      width: 25%;
+      font-weight: bold;
+    }
+    .note {
+      font-style: italic;
+    }
+	.print-btn {
+            margin-top: 20px;
+            text-align: center;
+        }
+		@media print {
+			.print-btn {
+			display: none;
+			}
+		}
+		fieldset {
+			margin-bottom: 5px;
+		}
+		.section {
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			margin-bottom: 20px;
+		}
+		.section legend {
+			font-weight: bold;
+		}
+		.form-row {
+			display: flex;
+			align-items: center;
+			margin: 6px 0;
+		}
+		.form-row input[type="checkbox"] {
+			margin-right: 10px;
+			transform: scale(1.2);
+		}
+		.form-row label {
+			margin-right: 10px;
+			flex: 1;
+			min-width: 250px;
+		}
+		.form-row input[type="text"] {
+			flex: 2;
+			padding: 4px 8px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}	  
+		.form-row select {
+			flex: 2;
+			height: 34px;
+			padding: 4px 8px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+		.checkbox-readonly {
+			position: relative;
+			display: inline-block;
+			padding-left: 24px;
+			cursor: default;
+			user-select: none;
+			font-size: 16px;
+		}
+
+.checkbox-readonly input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  pointer-events: none; /* Không cho click */
+}
+
+.checkbox-readonly::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #333;
+  border-radius: 3px;
+  background: white;
+}
+
+.checkbox-readonly input[type="checkbox"]:checked + span::after {
+  content: '✓';
+  position: absolute;
+  left: 2px;
+  top: -1px;
+  color: green;
+  font-weight: bold;
+  font-size: 18px;
+}
+    </style>
+</head>
+<body>
+	<div class="header">
+		<table>
+			<tr>
+				<td>TRƯỜNG CAO ĐẲNG NGHỀ<br>VIỆT NAM - HÀN QUỐC CÀ MAU<br><u><b>HỘI ĐỒNG TUYỂN SINH NĂM 2025</b></u></td>
+				<td><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><u><b>Độc lập - Tự do - Hạnh phúc</b></u><br><br><i>Cà Mau, {{ now }}</i></td>
+			</tr>
+		</table>
+	</div>
+	
+	<div class="section-title" style="font-size: 18px;">
+		PHIẾU NHẬN HỒ SƠ TUYỂN SINH<br>
+		Đợt xét tuyển: K2025 - {{ 'ĐỢT 1' if ts.MaDXT=='001' else 'Đợt 2' }}
+	</div>
+	
+	<fieldset class="section">
+        <legend>Thông tin thí sinh</legend>
+		<div class="form-row">
+			- Mã số: {{ ts.Maso }}
+		</div>
+		<div class="form-row">
+			- Họ và tên: {{ ts.Holot }} {{ ts. Ten }}
+		</div>
+		<div class="form-row">
+			- Sinh ngày: {{ ts.Ngaysinh.strftime('%d/%m/%Y') if ts.Ngaysinh else '' }}
+		</div>
+        <div class="form-row">
+			- Địa chỉ: {{ ts.Diachi }}
+		</div>
+		<div class="form-row">
+			- Điện thoại: {{ ts.Dienthoai }}
+		</div>
+		<div class="form-row">
+			- Trình độ: {{ ts.Fld01 }}
+		</div>
+    </fieldset>
+	
+	<fieldset class="section">
+        <legend>Thông tin hồ sơ</legend>
+		<table style="width: 100%; border-collapse: collapse;">
+			<tr>
+				<td>1. Phiếu đăng ký dự tuyển:</td>
+				<td><input type="checkbox" {% if hoso.hs1 %}checked{% endif %} style="pointer-events: none;"></td>
+				<td>5. Sơ yếu lý lịch:</td>
+				<td><input type="checkbox" {% if hoso.hs2 %}checked{% endif %} style="pointer-events: none;"></td>
+			</tr>
+			<tr>
+				<td>2a. Bằng tốt nghiệp:</td>
+				<td>
+					<input type="checkbox"
+						{% if (ts.MaDXT == '001' and hoso.hs6) or (ts.MaDXT != '001' and hoso.hs4) %}checked{% endif %}
+						style="pointer-events: none;">
+				</td>				
+				<td>6. CMND hoặc CCCD:</td>
+				<td><input type="checkbox" {% if hoso.hs12 %}checked{% endif %} style="pointer-events: none;"></td>
+			</tr>
+			<tr>
+				<td>2b. GCN TN tạm thời:</td>
+				<td>
+					<input type="checkbox"
+						{% if (ts.MaDXT == '001' and hoso.hs7) or (ts.MaDXT != '001' and hoso.hs5) %}checked{% endif %}
+						style="pointer-events: none;">
+				</td>
+				<td>7. Giấy khai sinh:</td>
+				<td><input type="checkbox" {% if hoso.hs3 %}checked{% endif %} style="pointer-events: none;"></td>
+			</tr>
+			<tr>
+				<td>3. Học bạ:</td>
+				<td>
+					<input type="checkbox"
+						{% if (ts.MaDXT == '001' and hoso.hs9) or (ts.MaDXT != '001' and hoso.hs8) %}checked{% endif %}
+						style="pointer-events: none;">
+				</td>
+				<td>8. 02 ảnh màu (3x4):</td>
+				<td><input type="checkbox" {% if hoso.hs11 %}checked{% endif %} style="pointer-events: none;"></td>
+			</tr>
+			<tr>
+				<td>4. Giấy tờ ưu tiêu (nếu có):</td>
+				<td>{{ hoso.hs13 or '' }}</td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+    </fieldset>
+	
+	<fieldset class="section">
+        <legend>Thông tin xét tuyển</legend>
+		<table style="width: 100%; border-collapse: collapse;">
+			<tr>
+				<td>- Điểm môn 1 (Toán): {{ '%.1f' | format(hoso.Mon1) if hoso.Mon1 is not none else ''}}</td>
+				<td>- Nguyện vọng 1: {{ nganh_nv1 }}</td>
+			</tr>
+			<tr>
+				<td>- Điểm môn 2 (Ngữ văn): {{ '%.1f' | format(hoso.Mon2) if hoso.Mon2 is not none else '' }}</td>
+				<td>- Nguyện vọng 2: {{ nganh_nv2 }}</td>
+			</tr>
+			<tr>
+				<td>- Điểm môn 3 (Ngoại ngữ): {{ '%.1f' | format(hoso.Mon3) if hoso.Mon3 is not none else ''}}</td>
+				<td>- Nguyện vọng 3: {{ nganh_nv3 }}</td>
+			</tr>
+		</table>
+    </fieldset>
+	
+	<div class="footer">
+  	<table>
+		<tr>
+			<td>
+			<b>Ghi chú:</b><br>
+			<i>1) Điều kiện để được xét tuyển:</i><br>
+			- Hồ sơ dự tuyển: Phải nộp ít nhất loại hồ sơ 1, 2, 3 và 4 <i>(nếu có)</i>.<br>
+			- Lệ phí xét tuyển: Phải thanh toán đủ trước ngày xét tuyển.<br>
+			<i>2) Thanh toán lệ phí xét tuyển trực tuyến:</i><br>
+			<i>- Cách 1:</i> Sử dụng chức năng thanh toán bằng quét mã QR trên phiếu<br>
+			bằng bất kỳ ứng dụng Ngân hàng có trên thiết bị di động.<br>
+			<i>- Cách 2:</i> Chuyển tiền đến tài khoản của Trường với các thông tin sau:<br>
+			+ Tên tài khoản: <b>TRUONG CD NGHE VIET NAM-HAN QUOC CA MAU</b><br>
+			+ Tên ngân hàng: <b>Vietcombank</b><br>
+			+ Số tài khoản: <b>1023082986</b><br>
+			+ Số tiền CK: <b>30,000</b><br>
+			+ Nội dung CK: <b>{{ noidung }}</b><br>
+			3) Dự kiến ngày xét tuyển: {{ '27/6/2025.' if ts.MaDXT=='001' else '22/8/2025.' }}<br>
+			4) Dự kiến ngày nhập học: 08/9/2025.<br>
+			</td>
+			<td align="center">
+				<fieldset align="center" class="section">
+					<legend>Quét mã QR</legend>
+						<img src="{{ maqr }}" alt="QR chuyển tiền" style="width:200px;">
+				</fieldset>
+				<b>NGƯỜI NHẬN HỒ SƠ</b>
+			</td>
+		</tr>
+		<tr>
+			<td>
+	__________________________________<br><br>
+	Khi cần biết thêm thông tin, vui lòng liên hệ:<br>
+	Điện thoại: 02903.592.101-02903.592.102<br>
+	Truy cập Website: <a href="https://camauvkc.edu.vn">https://camauvkc.edu.vn</a><br>
+	Facebook: <a href="https://facebook.com/camauvkc">https://facebook.com/camauvkc</a><br>
+	Zalo: <a href="http://zalo.me/camauvkc">http://zalo.me/camauvkc</a><br></i>
+			</td>
+			<td align="center"><b><br><br><br><br><br><br>{{ giaovien }}</b></td>
+	</tr>
+    </table>
+	</div>
+
+    <div class="print-btn">
+        <button onclick="window.print()">In phiếu</button>
+    </div>
+</body>
+</html>

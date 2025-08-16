@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Giấy báo trúng tuyển</title>
+    <style>
+        @media print {
+            body {
+                margin: 20mm;
+                font-family: Arial;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">In giấy báo</button>
+    </div>
+
+    <div class="container">
+        <h2 style="text-align: center;">GIẤY BÁO TRÚNG TUYỂN</h2>
+        <p>Họ và tên: <strong>{{ hoten }}</strong></p>
+        <p>Ngày sinh: {{ ngaysinh }}</p>
+        <p>Số báo danh: {{ maso }}</p>
+        <p>Ngành trúng tuyển: <strong>{{ tennganh }}</strong></p>
+        <p>Thời gian nhập học: {{ ngaynhaphoc }}</p>
+        <p>Địa điểm nhập học: {{ diachi }}</p>
+
+        <p style="text-align: right;">Ngày in: {{ ngayin }}</p>
+        <p style="text-align: right;">Phòng Tuyển sinh</p>
+    </div>
+</body>
+</html>
+
