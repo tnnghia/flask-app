@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect
-import pyodbc
+import pyodbc, os
 from datetime import datetime
 
 app = Flask(__name__)
@@ -7,14 +7,14 @@ app.secret_key = "secret"  # Needed for session management
 
 DB_CONFIGS = {
     "DB1": {
-        "DRIVER": "{SQL Server}",
+        "DRIVER": "{ODBC Driver 18 for SQL Server}",
         "SERVER": "115.78.235.164",
         "DATABASE": "EduManUni_CamauVKC",
         "UID": "vkc",
         "PWD": "daotaoVKC123"
     },
     "DB2": {
-        "DRIVER": "{SQL Server}",
+        "DRIVER": "{ODBC Driver 18 for SQL Server}",
         "SERVER": "115.78.235.164",
         "DATABASE": "Daotao_CamauVKC",
         "UID": "vkc",
