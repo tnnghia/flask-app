@@ -89,7 +89,7 @@ def api_get_sinhvien():
             "Sohieu": r["Sohieu"] or "",
             "Sovaoso": r["Sovaoso"] or "",
             "DTBTLBon": r["DTBTLBon"],
-            "Ngayky": r["Ngayky"]
+            "Ngayky": r["Ngayky"].strftime("%d/%m/%Y") if r["Ngayky"] else None
         }
         for r in cur.fetchall()
     ]
